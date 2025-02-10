@@ -12,16 +12,19 @@
 """
 wget https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx
 wget https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin
-uv run app.py
+uv run examples/app.py
 """
 
 import gradio as gr
-from kokoro_onnx import Kokoro, SUPPORTED_LANGUAGES
+from kokoro_onnx import Kokoro
 from kokoro_onnx.tokenizer import Tokenizer
 import numpy as np
 
 tokenizer = Tokenizer()
 kokoro = Kokoro("kokoro-v1.0.onnx", "voices-v1.0.bin")
+
+
+SUPPORTED_LANGUAGES = ["en-us"]
 
 
 def create(text: str, voice: str, language: str, blend_voice_name: str = None):
@@ -33,10 +36,7 @@ def create(text: str, voice: str, language: str, blend_voice_name: str = None):
         second_voice = kokoro.get_voice_style(blend_voice_name)
         voice = np.add(first_voice * (50 / 100), second_voice * (50 / 100))
     samples, sample_rate = kokoro.create(
-        text="",
-        phonemes=phonemes,
-        voice=voice,
-        speed=1.0,
+        phonemes, voice=voice, speed=1.0, is_phonemes=True
     )
     return [(sample_rate, samples), phonemes]
 

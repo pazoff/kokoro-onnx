@@ -16,7 +16,6 @@ from numpy.typing import NDArray
 from .config import (
     MAX_PHONEME_LENGTH,
     SAMPLE_RATE,
-    SUPPORTED_LANGUAGES,
     EspeakConfig,
     KoKoroConfig,
 )
@@ -146,16 +145,12 @@ class Kokoro:
         voice: str | NDArray[np.float32],
         speed: float = 1.0,
         lang: str = "en-us",
-        phonemes: str | None = None,
+        is_phonemes: bool = False,
         trim: bool = True,
     ) -> tuple[NDArray[np.float32], int]:
         """
         Create audio from text using the specified voice and speed.
         """
-
-        assert (
-            lang in SUPPORTED_LANGUAGES
-        ), f"Language must be either {', '.join(SUPPORTED_LANGUAGES)}. Got {lang}"
         assert speed >= 0.5 and speed <= 2.0, "Speed should be between 0.5 and 2.0"
 
         if isinstance(voice, str):
@@ -163,7 +158,9 @@ class Kokoro:
             voice = self.get_voice_style(voice)
 
         start_t = time.time()
-        if not phonemes:
+        if is_phonemes:
+            phonemes = text
+        else:
             phonemes = self.tokenizer.phonemize(text, lang)
         # Create batches of phonemes by splitting spaces to MAX_PHONEME_LENGTH
         batched_phoenemes = self._split_phonemes(phonemes)
@@ -189,22 +186,21 @@ class Kokoro:
         voice: str | NDArray[np.float32],
         speed: float = 1.0,
         lang: str = "en-us",
-        phonemes: str | None = None,
+        is_phonemes: bool = False,
         trim: bool = True,
     ) -> AsyncGenerator[tuple[NDArray[np.float32], int], None]:
         """
         Stream audio creation asynchronously in the background, yielding chunks as they are processed.
         """
-        assert (
-            lang in SUPPORTED_LANGUAGES
-        ), f"Language must be either {', '.join(SUPPORTED_LANGUAGES)}. Got {lang}"
         assert speed >= 0.5 and speed <= 2.0, "Speed should be between 0.5 and 2.0"
 
         if isinstance(voice, str):
             assert voice in self.voices, f"Voice {voice} not found in available voices"
             voice = self.get_voice_style(voice)
 
-        if not phonemes:
+        if is_phonemes:
+            phonemes = text
+        else:
             phonemes = self.tokenizer.phonemize(text, lang)
 
         batched_phonemes = self._split_phonemes(phonemes)
@@ -237,6 +233,3 @@ class Kokoro:
 
     def get_voices(self) -> list[str]:
         return list(sorted(self.voices.keys()))
-
-    def get_languages(self) -> list[str]:
-        return SUPPORTED_LANGUAGES

@@ -8,7 +8,7 @@ https://github.com/user-attachments/assets/00ca06e8-bbbd-4e08-bfb7-23c0acb10ef9
 
 ## Features
 
-- Supports English (with French, Japanese, Korean, and Chinese coming soon)
+- Supports multiple languages 
 - Fast performance near real-time on macOS M1
 - Offer multiple voices
 - Lightweight: ~300MB (quantized: ~80MB)
@@ -57,7 +57,9 @@ See [examples](examples)
 
 ## Voices
 
-See the latest information in [kokoro-onnx/releases](https://github.com/thewh1teagle/kokoro-onnx/releases)
+See the latest voices and languages in [Kokoro-82M/VOICES.md](https://huggingface.co/hexgrad/Kokoro-82M/blob/main/VOICES.md)
+
+Note: It's recommend to use misaki g2p package from v1.0, see [examples/language.py](examples/language.py)
 
 ## Contribute
 
